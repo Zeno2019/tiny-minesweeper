@@ -1,0 +1,13 @@
+{
+  "prettier.configPath": "./prettier.config.js",
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html"
+  },
+  "reactSnippets.settings.prettierEnabled": true,
+}
