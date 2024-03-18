@@ -1,5 +1,7 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+import { GameState, Position } from '@/type';
 
 /**
  * Combines multiple class names into a single string.
@@ -8,7 +10,7 @@ import { twMerge } from "tailwind-merge"
  * @return {string} The combined class names as a single string.
  */
 export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -17,5 +19,9 @@ export function cn(...inputs: ClassValue[]): string {
  * @return {string} A randomly generated UUID.
  */
 export function genUUID(): string {
-  return crypto.randomUUID()
+  return crypto.randomUUID();
+}
+
+export function getFlatPosi({ p, w }: { p: Position; w: GameState['w'] }) {
+  return p.x + p.y * w;
 }
