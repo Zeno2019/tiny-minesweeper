@@ -1,8 +1,8 @@
-import clsx from 'clsx';
 import Social from '../Social';
+import { cn } from '@/lib/utils';
 
 export default function Footer({ className }: { className?: string }) {
-  const cls = clsx(['flex', 'place-items-center', 'gap-6', className]);
+  const cls = cn('flex', 'place-items-center', 'gap-6', className);
 
   return (
     <div className={cls}>
