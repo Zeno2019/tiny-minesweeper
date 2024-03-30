@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { GameState, Position } from '@/type';
+import { GameState, MatrixShape, Position } from '@/type';
 
 /**
  * Combines multiple class names into a single string.
@@ -22,6 +22,16 @@ export function genUUID(): string {
   return crypto.randomUUID();
 }
 
+// About Game Logic
+
 export function getFlatPosi({ p, w }: { p: Position; w: GameState['w'] }) {
   return p.x + p.y * w;
+}
+export function isValidSize(size: MatrixShape) {
+  const { w, h } = size;
+
+  const isValidWidth = [9, 16, 30].includes(w);
+  const isValidHeight = [9, 16].includes(h);
+
+  return isValidWidth && isValidHeight && w >= h;
 }

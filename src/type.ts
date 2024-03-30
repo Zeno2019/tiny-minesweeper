@@ -1,10 +1,15 @@
+import { DateTime } from 'luxon';
+
 // out of game
+// export type DATE_FORMATS = 'yyyy-MM-dd' | 'yyyy-MM-dd HH:mm:ss';
+
 export type GameExperienceState = {
   isDevMode: boolean;
   isDarkMode: boolean;
 };
 
 // back to game
+// TODO: 后续可添加暂停状态
 export type CurrGameStatus = 'won' | 'lost' | 'playing';
 
 export type MatrixShape = {
@@ -12,12 +17,16 @@ export type MatrixShape = {
   h: number;
 };
 
+export interface GameBase {
+  checkGameStatus(): void;
+}
+
 export interface GameState {
   status: CurrGameStatus;
   w: MatrixShape['w'];
   h: MatrixShape['h'];
-  startTime: number | typeof Date; // timeStamp ?
-  endTime: number | typeof Date; // timeStamp ?
+  startTime: typeof DateTime | number | null;
+  endTime: typeof DateTime | number | null;
   minePlaced: boolean;
   board: BlockType[]; // flatten the matrix array
 }
