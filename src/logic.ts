@@ -1,8 +1,10 @@
 import { proxy, snapshot, subscribe } from 'valtio';
 import { proxyWithHistory } from 'valtio-history';
 import { genUUID, isValidSize } from './lib/utils';
-import { BlockType, CurrGameStatus, GameBase, GameState, Position } from './type';
+import { BlockType, GameBase, GameState, Position } from './type';
 import { DateTime } from 'luxon';
+import { watch } from 'valtio/utils';
+import { fromEvent } from 'rxjs';
 
 function createBlock({ x, y }: Position): BlockType {
   return {
@@ -21,11 +23,11 @@ export class GameInstance implements GameBase {
   history: Map<number, GameState>;
   currStep: number;
 
-  constructor() {
+  constructor(w = 9, h = 9) {
     const { value } = proxyWithHistory<GameState>({
       status: 'playing',
-      w: 9,
-      h: 9,
+      w,
+      h,
       board: [],
       startTime: DateTime.now().toUnixInteger(),
       endTime: null,
@@ -37,6 +39,7 @@ export class GameInstance implements GameBase {
     this.currStep = 0;
 
     this.initBoard(this.state.w, this.state.h);
+    this.initWatcher();
   }
 
   initBoard(w = this.state.w, h = this.state.h) {
@@ -57,6 +60,21 @@ export class GameInstance implements GameBase {
     // this.saveSnapshot();
 
     return this;
+  }
+
+  initWatcher() {
+    console.info('init watcher...');
+
+    // Data Watcher
+    watch((get) => {
+      const board = get(this.state).board;
+
+      // 这里可以根据board的变化执行相应的逻辑
+      // 例如，检查游戏状态、更新UI等
+      console.info('Board has changed', board);
+    });
+
+
   }
 
   checkGameStatus(): void {

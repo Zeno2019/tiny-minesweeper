@@ -3,13 +3,15 @@ import { Button } from '@/components/ui/button';
 export type BlockProps = {
   tipsNum: number;
   onClick?: () => void;
+  'data-x'?: number;
+  'data-y'?: number;
 };
 
 const Block = (props: BlockProps) => {
-  const { tipsNum, onClick } = props;
+  const { tipsNum, onClick, ...rest } = props;
 
   return (
-    <Button variant='ghost' className='h-8 w-8 flex place-items-center m-[1px] bg-indigo-200 rounded-[2px]' onClick={onClick}>
+    <Button variant='ghost' className='h-8 w-8 flex place-items-center m-[1px] bg-indigo-200 rounded-[2px]' onClick={onClick} {...rest}>
       {tipsNum}
     </Button>
   );
