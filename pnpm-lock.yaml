@@ -38,6 +38,9 @@ dependencies:
   valtio:
     specifier: ^1.13.2
     version: 1.13.2(@types/react@18.2.64)(react@18.2.0)
+  valtio-history:
+    specifier: ^0.3.2
+    version: 0.3.2(valtio@1.13.2)
 
 devDependencies:
   '@types/luxon':
@@ -2682,6 +2685,15 @@ packages:
 
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  /valtio-history@0.3.2(valtio@1.13.2):
+    resolution: {integrity: sha512-IR4QrjLH0ilaNAcmXHqYaYHdRk6S7mNA8MUTcmVFF6IfuYp+I9oRb2aaj0hy+GKLfD2rmJ41uE8dQ1h0MqXxQA==}
+    peerDependencies:
+      valtio: '>=1.0.0'
+    dependencies:
+      tslib: 2.6.2
+      valtio: 1.13.2(@types/react@18.2.64)(react@18.2.0)
+    dev: false
 
   /valtio@1.13.2(@types/react@18.2.64)(react@18.2.0):
     resolution: {integrity: sha512-Qik0o+DSy741TmkqmRfjq+0xpZBXi/Y6+fXZLn0xNF1z/waFMbE3rkivv5Zcf9RrMUp6zswf2J7sbh2KBlba5A==}

@@ -1,5 +1,5 @@
 import { proxy, snapshot, subscribe } from 'valtio';
-import { proxyWithHistory } from 'valtio/utils';
+import { proxyWithHistory } from 'valtio-history';
 import { genUUID, isValidSize } from './lib/utils';
 import { BlockType, CurrGameStatus, GameBase, GameState, Position } from './type';
 import { DateTime } from 'luxon';
@@ -22,7 +22,7 @@ export class GameInstance implements GameBase {
   currStep: number;
 
   constructor() {
-    this.state = proxy<GameState>({
+    const { value } = proxyWithHistory<GameState>({
       status: 'playing',
       w: 9,
       h: 9,
@@ -32,6 +32,7 @@ export class GameInstance implements GameBase {
       minePlaced: false,
     });
 
+    this.state = value;
     this.history = new Map<number, GameState>(); // 记录快照
     this.currStep = 0;
 
@@ -39,7 +40,6 @@ export class GameInstance implements GameBase {
   }
 
   initBoard(w = this.state.w, h = this.state.h) {
-
     if (!isValidSize({ w, h })) throw new Error('invalid size');
 
     const board = Array.from({ length: w * h }, (_, idx) => {
@@ -56,25 +56,24 @@ export class GameInstance implements GameBase {
     // 初始化后进行保存
     // this.saveSnapshot();
 
-    return this
+    return this;
   }
 
   checkGameStatus(): void {
     if (this.state.status === 'lost') {
       alert('you lose');
-      return
+      return;
     }
 
     if (this.state.status === 'won') {
       alert('you won');
-      return
+      return;
     }
 
     if (this.state.status === 'playing') {
       // saveSnapshot or do nothing ...
       ++this.currStep;
     }
-
   }
 
   // TODO: snapShot 功能暂不开放，注意：这里的数据是 valtio 的代理对象，可能会有一些待解决的问题
@@ -92,5 +91,4 @@ export class GameInstance implements GameBase {
   //     //
   //   }
   // }
-
 }
