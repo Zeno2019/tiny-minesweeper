@@ -1,4 +1,3 @@
-//@ts-nocheck
 
 import React from 'react';
 import Block from './plugin/Block';
@@ -26,10 +25,13 @@ export default function DashBoard() {
         console.info('e', ev);
         const target = ev.target;
         if (target) {
-          const blockX = target.getAttribute('data-x');
-          const blockY = target.getAttribute('data-y');
+          // @ts-ignore
+          const x = target.getAttribute('data-x');
+          // @ts-ignore
+          const y = target.getAttribute('data-y');
+          console.info('MineSweeper', MineSweeper);
 
-          console.info('blockX', blockX, 'blockY', blockY);
+          MineSweeper.checkGameStatus({ x: Number(x), y: Number(y) });
         }
       });
     }
@@ -38,9 +40,9 @@ export default function DashBoard() {
   return (
     <div className={cls} id='board-wrapper'>
       {board?.map((b) => {
-        const { x, y } = b;
+        const { x, y, key, tipsNum } = b;
 
-        return <Block key={b.key} tipsNum={b.tipsNum} data-x={x} data-y={y} />;
+        return <Block key={key} tipsNum={tipsNum} data-x={x} data-y={y} />;
       })}
     </div>
   );

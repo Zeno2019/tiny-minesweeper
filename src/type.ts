@@ -18,7 +18,7 @@ export type MatrixShape = {
 };
 
 export interface GameBase {
-  checkGameStatus(): void;
+  checkGameStatus(...args: any[]): void;
 }
 
 export interface GameState {

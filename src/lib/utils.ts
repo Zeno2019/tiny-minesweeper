@@ -23,7 +23,6 @@ export function genUUID(): string {
 }
 
 // About Game Logic
-
 export function getFlatPosi({ p, w }: { p: Position; w: GameState['w'] }) {
   return p.x + p.y * w;
 }
@@ -34,4 +33,8 @@ export function isValidSize(size: MatrixShape) {
   const isValidHeight = [9, 16].includes(h);
 
   return isValidWidth && isValidHeight && w >= h;
+}
+
+export function isInBoard(p: Position, w: GameState['w'], h: GameState['h']) {
+  return p.x >= 0 && p.y >= 0 && p.x < w && p.y < h;
 }
