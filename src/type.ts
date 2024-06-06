@@ -42,7 +42,7 @@ export type BlockType = {
   tipsNum: number;
   hasMine: boolean;
   isCovered: boolean;
-  flagged: boolean;
+  flagged?: boolean;
   isDoubted?: boolean;
   key?: string;
 };

@@ -77,14 +77,17 @@ export class GameInstance implements GameBase {
   }
 
   initWatcher() {
-    console.info('init watcher...');
-
     // Data Watcher
     watch((get) => {
-      const board = get(this.state).board;
+      console.info('init watcher...');
+
+      // const state = get(this.state);
+      const board = get(this.state.board);
 
       // 这里可以根据board的变化执行相应的逻辑
       // 例如, 检查游戏状态、更新UI等
+
+      // console.info('state has changed', state);
       console.info('Board has changed', board);
     });
   }
@@ -120,15 +123,23 @@ export class GameInstance implements GameBase {
   placeMine(currBoard: BlockType[], firstPosition: Position) {
     this.state.minePlaced = true;
 
-    const sibilings = this.getSiblingsIdx(firstPosition);
-    console.info('sibilings', sibilings);
-
     // 获取第一个 block 位置, 调用其九宫格的处理逻辑, 当前格必定不为雷, 但同时需要在周围放完雷, 有了 tipsNum 之后, 再展开当前格子
+    this.discoverBlock(firstPosition);
+
+    const sibilings = this.getSiblingsIdx(firstPosition);
+    console.info('placeMine', { sibilings, firstPosition });
+
   }
 
+  // 揭开对应的 block
   discoverBlock({ x, y }: Position) {
     const idx = getFlatPosi({ p: { x, y }, w: this.state.w });
-    const block = this.state.board[idx];
+    const block = this.state?.board[idx];
+
+    if (block && !block.hasMine && block.isCovered) {
+      block.isCovered = false;
+    }
+    
   }
 
   // 获取当前 block 的 8 个相邻 block 索引
