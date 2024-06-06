@@ -12,9 +12,9 @@ export interface BlockProps {
 }
 
 function transformCls(isActived: boolean) {
-  const baseCls = 'h-8 w-8 flex place-items-center m-[1px] hover:bg-inherit rounded-[2px]';
-  const inactivedCls = 'bg-indigo-200';
-  const activedCls = 'bg-inherit';
+  const baseCls = 'h-8 w-8 flex place-items-center m-[1px]  rounded-[2px]';
+  const inactivedCls = 'bg-indigo-200 hover:bg-indigo-100';
+  const activedCls = 'bg-inherit hover:bg-inherit';
 
   const cls = cn(baseCls, isActived ? activedCls : inactivedCls);
 
