@@ -1,7 +1,7 @@
 import { proxy, snapshot, subscribe } from 'valtio';
 import { proxyWithHistory } from 'valtio-history';
-import { genUUID, getFlatPosi, isInBoard, isValidSize } from './lib/utils';
-import { BlockType, GameBase, GameState, Position } from './type';
+import { genUUID, getFlatPosi, isInBoard, isValidSize, getMinesTotal } from './lib/utils';
+import { BlockType, GameBase, GameState, Position, MatrixShape } from './type';
 import { DateTime } from 'luxon';
 import { watch } from 'valtio/utils';
 import { fromEvent } from 'rxjs';
@@ -44,6 +44,7 @@ export class GameInstance implements GameBase {
       startTime: DateTime.now().toUnixInteger(),
       endTime: null,
       minePlaced: false,
+      minesTotal: getMinesTotal({ w, h }),
     });
 
     this.state = value;
@@ -111,7 +112,13 @@ export class GameInstance implements GameBase {
 
       // Just First Step
       if (!this.state.minePlaced) {
-        this.placeMine(this.state.board, { x, y });
+        const firstPosition = { x, y };
+        const size = { w: this.state.w, h: this.state.h };
+
+        // 放雷并标识雷数目
+        this.placeMine(this.state.board, size, firstPosition);
+        // this.genTipsNum(this.state.board);
+
         return;
       }
 
@@ -120,15 +127,57 @@ export class GameInstance implements GameBase {
   }
 
   // place the mine
-  placeMine(currBoard: BlockType[], firstPosition: Position) {
+  placeMine(board: BlockType[], size: MatrixShape, firstPosition: Position) {
     this.state.minePlaced = true;
 
     // 获取第一个 block 位置, 调用其九宫格的处理逻辑, 当前格必定不为雷, 但同时需要在周围放完雷, 有了 tipsNum 之后, 再展开当前格子
     this.discoverBlock(firstPosition);
 
-    const sibilings = this.getSiblingsIdx(firstPosition);
-    console.info('placeMine', { sibilings, firstPosition });
+    const firstClkIdx = getFlatPosi({ p: firstPosition, w: size.w });
+    // const exclude = new Set([firstClkIdx]); // 避免重复放雷，最终包括首次点击的格子，合计 11 个排除项
 
+    const excludeIdx = firstClkIdx;
+
+    try {
+      const minesTotal = getMinesTotal(size);
+      let minesPlaced = 0;
+
+      while (minesPlaced < minesTotal) {
+        let randomIndex = Math.floor(Math.random() * board.length);
+
+        if (randomIndex !== excludeIdx && !board[randomIndex].hasMine) {
+          const block = board[randomIndex];
+          block.hasMine = true;
+          block.tipsNum = -(minesTotal + 1);
+
+          const sibilings = this.getSiblingsIdx({
+            x: block.x,
+            y: block.y,
+          });
+
+          this.updateTipsNum(board, sibilings);
+
+          ++minesPlaced;
+        }
+      }
+
+      // const mines = board
+      //   .map((b, index) => {
+      //     if (b.hasMine) {
+      //       return [index, b];
+      //     }
+      //   })
+      //   .filter((b) => b);
+
+      // // @ts-ignore
+      // const minesMap = new Map(mines);
+
+      // console.info('generated mines done', { minesPlaced, minesTotal, mines, minesMap });
+
+      console.info('generated mines done', { minesPlaced, minesTotal });
+    } catch (err) {
+      console.error('generated mines error', err);
+    }
   }
 
   // 揭开对应的 block
@@ -139,7 +188,6 @@ export class GameInstance implements GameBase {
     if (block && !block.hasMine && block.isCovered) {
       block.isCovered = false;
     }
-    
   }
 
   // 获取当前 block 的 8 个相邻 block 索引
@@ -156,9 +204,14 @@ export class GameInstance implements GameBase {
           return posiIdx;
         }
       })
-      .filter(Boolean) as number[];
+      .filter((idx) => idx !== undefined && idx >= 0) as number[];
 
     return res;
+  }
+
+  // 更新每个传入的 index 对应的 block 的 tipsNum
+  updateTipsNum(board: BlockType[], sibilings: number[]) {
+    sibilings.forEach((idx) => ++board[idx].tipsNum);
   }
 
   // TODO: snapShot 功能暂不开放, 注意：这里的数据是 valtio 的代理对象, 可能会有一些待解决的问题

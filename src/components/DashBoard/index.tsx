@@ -11,17 +11,15 @@ export default function DashBoard() {
   const { board, w, h } = useSnapshot(MineSweeper.state);
 
   // 此处为解决 tailwind grid-rows-${w} 有时不生效的问题
-  const cls = cn(w > 9 ? `grid-rows-${w}` : 'grid-rows-9', h > 9 ? `grid-cols-${h}` : 'grid-cols-9', 'min-h-[16rem]', 'grid');
+  const layoutCls = cn(w > 9 ? `grid-rows-${w}` : 'grid-rows-9', h > 9 ? `grid-cols-${h}` : 'grid-cols-9', 'min-h-[16rem]', 'grid');
+  const cls = cn(layoutCls);
 
   const ref = React.useRef(null);
 
   React.useEffect(() => {
-    // const bEl = document.getElementById('board-wrapper');
     const bEl = ref.current;
 
     if (bEl) {
-      console.info('bEl be create');
-
       // Event Watcher
       fromEvent(bEl, 'click').subscribe((ev: any) => {
         const target = ev?.target;
@@ -38,11 +36,11 @@ export default function DashBoard() {
   }, []);
 
   return (
-    <div className={cls} id='board-wrapper' ref={ref}>
+    <div className={cls} ref={ref}>
       {board?.map((b) => {
         const { x, y, key, tipsNum, hasMine, isCovered, isDoubted, flagged } = b;
 
-        return <Block key={key} tipsNum={tipsNum} hasMine={hasMine} isCovered={isCovered} data-x={x} data-y={y}  />;
+        return <Block key={key} tipsNum={tipsNum} hasMine={hasMine} isCovered={isCovered} data-x={x} data-y={y} />;
       })}
     </div>
   );

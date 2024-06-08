@@ -28,6 +28,7 @@ export interface GameState {
   startTime: typeof DateTime | number | null;
   endTime: typeof DateTime | number | null;
   minePlaced: boolean;
+  minesTotal: number;
   board: BlockType[]; // flatten the matrix array
 }
 

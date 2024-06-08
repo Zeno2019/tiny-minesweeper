@@ -35,6 +35,42 @@ export function isValidSize(size: MatrixShape) {
   return isValidWidth && isValidHeight && w >= h;
 }
 
+export function getMinesTotal(size: MatrixShape) {
+  if (!isValidSize(size)) throw new Error('invalid size!');
+
+  const totalsEnum = {
+    '9x9': 10,
+    '16x16': 40,
+    '30x16': 99,
+  } as any;
+
+  return totalsEnum[`${size.w}x${size.h}`];
+}
+
+// export function generateMines(board: GameState['board'], size: MatrixShape, firstPosition: Position) {
+//   const firstClkIdx = getFlatPosi({ p: firstPosition, w: size.w });
+//   const exclude = new Set([firstClkIdx]);
+
+//   try {
+//     const minesTotal = getMinesTotal(size);
+//     let minesPlaced = 0;
+
+//     while (minesPlaced < minesTotal) {
+//       let randomIndex = Math.floor(Math.random() * board.length);
+
+//       if (!exclude.has(randomIndex) && !board[randomIndex].hasMine) {
+//         board[randomIndex].hasMine = true;
+//         exclude.add(randomIndex);
+//         minesPlaced++;
+//       }
+//     }
+
+//     console.info('generated mines done', { minesPlaced, minesTotal, exclude });
+//   } catch (err) {
+//     console.error('generated mines error', err);
+//   }
+// }
+
 export function isInBoard(p: Position, w: GameState['w'], h: GameState['h']) {
   return p.x >= 0 && p.y >= 0 && p.x < w && p.y < h;
 }
