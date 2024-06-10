@@ -29,7 +29,7 @@ const directions = [
   [1, -1],
 ];
 
-let MineSweeper;
+let MineSweeper: GameInstance;
 
 export class GameInstance implements GameBase {
   state: GameState;
