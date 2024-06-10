@@ -44,7 +44,7 @@ export class GameInstance implements GameBase {
       board: [],
       startTime: DateTime.now().toUnixInteger(),
       endTime: null,
-      devMode: true,
+      devMode: false,
       minePlaced: false,
       minesTotal: getMinesTotal({ w, h }),
     });
@@ -53,11 +53,11 @@ export class GameInstance implements GameBase {
     this.history = new Map<number, GameState>(); // 记录快照
     this.currStep = 0;
 
-    this.initBoard(this.state.w, this.state.h);
+    this.initBoard({ w, h });
     this.initWatcher();
   }
 
-  initBoard(w = this.state.w, h = this.state.h) {
+  initBoard({ w, h }: MatrixShape) {
     if (!isValidSize({ w, h })) throw new Error('invalid size');
 
     const board = Array.from({ length: w * h }, (_, idx) => {
@@ -257,6 +257,10 @@ export class GameInstance implements GameBase {
     sibilings.forEach((idx) => ++board[idx].tipsNum);
   }
 
+  toggleDevMode() {
+    this.state.devMode = !this.state.devMode;
+  }
+
   // 重置游戏
   reset() {}
 
@@ -277,6 +281,7 @@ export class GameInstance implements GameBase {
   // }
 }
 
-MineSweeper = new GameInstance
+// MineSweeper = new GameInstance()
+MineSweeper = new GameInstance(16, 16);
 
 export { MineSweeper };
