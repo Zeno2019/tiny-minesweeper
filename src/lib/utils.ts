@@ -47,6 +47,21 @@ export function getMinesTotal(size: MatrixShape) {
   return totalsEnum[`${size.w}x${size.h}`];
 }
 
+export function isLeagalGameEl(e: MouseEvent | TouchEvent) {
+  console.info('isLeagalGameEl', e);
+
+  const target = e?.target as HTMLElement | null;
+  if (!target) throw new Error('target is null');
+
+  const x = target.getAttribute('data-x');
+  const y = target.getAttribute('data-y');
+
+  // if (x === null || y === null) throw new Error('x or y is null');
+  if (x === null || y === null) return false;
+
+  return true;
+}
+
 // export function generateMines(board: GameState['board'], size: MatrixShape, firstPosition: Position) {
 //   const firstClkIdx = getFlatPosi({ p: firstPosition, w: size.w });
 //   const exclude = new Set([firstClkIdx]);

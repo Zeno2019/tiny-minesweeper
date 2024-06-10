@@ -23,7 +23,7 @@ function transformCls(isActived: boolean) {
 }
 
 const Bomb = (props: any) => {
-  return <BombIcon className='w-5 h-5 absolute' />;
+  return <BombIcon className='w-5 h-5 absolute pointer-events-none' />;
 };
 
 const Block = (props: BlockProps) => {

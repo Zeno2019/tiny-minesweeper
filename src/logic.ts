@@ -1,10 +1,8 @@
-import { proxy, snapshot, subscribe } from 'valtio';
 import { proxyWithHistory } from 'valtio-history';
+import { watch } from 'valtio/utils';
 import { genUUID, getFlatPosi, isInBoard, isValidSize, getMinesTotal } from './lib/utils';
 import { BlockType, GameBase, GameState, Position, MatrixShape } from './type';
 import { DateTime } from 'luxon';
-import { watch } from 'valtio/utils';
-import { fromEvent } from 'rxjs';
 
 function createBlock({ x, y }: Position): BlockType {
   return {
@@ -69,33 +67,28 @@ export class GameInstance implements GameBase {
     });
 
     this.state.board = board;
-    console.info('board', board);
 
     // 初始化后进行保存
     // this.saveSnapshot();
-
     return this;
   }
 
   initWatcher() {
-    // Data Watcher
+    // board Watcher
     watch((get) => {
-      console.info('init watcher...');
-
       // const state = get(this.state);
       const board = get(this.state.board);
 
       // 这里可以根据board的变化执行相应的逻辑
       // 例如, 检查游戏状态、更新UI等
 
-      // console.info('state has changed', state);
       console.info('Board has changed', board);
     });
   }
 
   // 处理游戏逻辑的入口
   // 这里其实可以用 key, 但是抽象成矩阵的设计思路, 让我倾向于这里用坐标
-  checkGameStatus({ x, y }: Position): void {
+  checkGameStatus(position: Position) {
     if (this.state.status === 'lost') {
       console.info('you lose');
       return;
@@ -107,31 +100,66 @@ export class GameInstance implements GameBase {
     }
 
     if (this.state.status === 'playing') {
-      // saveSnapshot or do nothing ...
-      ++this.currStep;
-
       // Just First Step
       if (!this.state.minePlaced) {
-        const firstPosition = { x, y };
+        const firstPosition = position;
         const size = { w: this.state.w, h: this.state.h };
 
         // 放雷并标识雷数目
-        this.placeMine(this.state.board, size, firstPosition);
-        // this.genTipsNum(this.state.board);
+        this.placeMines(this.state.board, size, firstPosition);
+        ++this.currStep;
 
         return;
-      }
+      } else {
+        // normal step
+        const idx = getFlatPosi({ p: position, w: this.state.w });
+        const block = this.state.board?.[idx];
 
-      // normal step
+        console.info('normal position', position);
+
+        // 💣 boom...
+        if (block.hasMine) {
+          this.state.status = 'lost';
+          ++this.currStep;
+          this.checkGameStatus(position);
+
+          return;
+        }
+
+        // 🤔 continue...
+        if (block.isCovered) {
+          this.discoverBlock(position);
+          ++this.currStep;
+
+          // 🥇 yeah!
+          if (this.isFulfillWinConditions()) {
+            this.state.status = 'won';
+          }
+
+          this.checkGameStatus(position);
+
+          return;
+        }
+      }
     }
   }
 
-  // place the mine
-  placeMine(board: BlockType[], size: MatrixShape, firstPosition: Position) {
-    this.state.minePlaced = true;
+  // 判断是否满足胜利条件
+  isFulfillWinConditions() {
+    const board = this.state.board
+    const total = getMinesTotal({ w: this.state.w, h: this.state.h });
 
-    // 获取第一个 block 位置, 调用其九宫格的处理逻辑, 当前格必定不为雷, 但同时需要在周围放完雷, 有了 tipsNum 之后, 再展开当前格子
-    this.discoverBlock(firstPosition);
+    // 1. 全部标记正确(最终还是要揭开来进行验证，此条件不正确)
+    // 2. 剩下未被揭开的 block 数目跟雷数目相等
+    const stillCoveredBlocks = board?.filter((b) => b.isCovered);
+    const isFulfilled = stillCoveredBlocks?.length === total;
+
+    return isFulfilled;
+  }
+
+  // place the mines
+  placeMines(board: BlockType[], size: MatrixShape, firstPosition: Position) {
+    this.state.minePlaced = true;
 
     const firstClkIdx = getFlatPosi({ p: firstPosition, w: size.w });
     // const exclude = new Set([firstClkIdx]); // 避免重复放雷，最终包括首次点击的格子，合计 11 个排除项
@@ -174,19 +202,32 @@ export class GameInstance implements GameBase {
 
       // console.info('generated mines done', { minesPlaced, minesTotal, mines, minesMap });
 
-      console.info('generated mines done', { minesPlaced, minesTotal });
+      // 首次点击必定不为雷, 但同时需要在全局放完雷, 有了 tipsNum 之后, 再揭开当前格子
+      this.discoverBlock(firstPosition);
+
+      console.info('generated mines done');
     } catch (err) {
       console.error('generated mines error', err);
     }
   }
 
-  // 揭开对应的 block
+  // 递归揭开 block
   discoverBlock({ x, y }: Position) {
     const idx = getFlatPosi({ p: { x, y }, w: this.state.w });
-    const block = this.state?.board[idx];
+    const block = this.state.board?.[idx];
 
-    if (block && !block.hasMine && block.isCovered) {
+    // if (block && !block.hasMine && block.isCovered) {
+    if (block && block.isCovered) {
       block.isCovered = false;
+
+      const sibilings = this.getSiblingsIdx({ x, y });
+      sibilings.forEach((i) => {
+        const sBlock = this.state.board?.[i];
+
+        if (sBlock.tipsNum === 0) {
+          this.discoverBlock({ x: sBlock.x, y: sBlock.y });
+        }
+      });
     }
   }
 
