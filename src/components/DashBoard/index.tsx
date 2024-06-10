@@ -1,15 +1,12 @@
 import React from 'react';
 import Block from './plugin/Block';
 import { cn, isLeagalGameEl } from '@/lib/utils';
-import { GameInstance } from '@/logic';
+import { MineSweeper } from '@/logic';
 import { useSnapshot } from 'valtio';
 import { of, fromEvent, map, catchError } from 'rxjs';
 
-const MineSweeper = new GameInstance();
-// const MineSweeper = new GameInstance(30, 16);
-
 export default function DashBoard() {
-  const { board, w, h } = useSnapshot(MineSweeper.state);
+  const { board, devMode, w, h } = useSnapshot(MineSweeper.state);
 
   // 此处为解决 tailwind grid-rows-${w} 有时不生效的问题
   const layoutCls = cn(
@@ -31,11 +28,11 @@ export default function DashBoard() {
   const ref = React.useRef(null);
 
   React.useEffect(() => {
-    const bEl = ref.current;
+    const boardEl = ref.current;
 
-    if (bEl) {
+    if (boardEl) {
       // Event Watcher
-      fromEvent<MouseEvent>(bEl, 'click')
+      fromEvent<MouseEvent>(boardEl, 'click')
         .pipe(
           map((ev) => {
             const target = ev?.target as HTMLElement;
@@ -45,9 +42,7 @@ export default function DashBoard() {
               const y = target.getAttribute('data-y');
 
               const position = { x: Number(x), y: Number(y) };
-              console.info('MineSweeper', MineSweeper, ev, { x, y });
-
-              MineSweeper.checkGameStatus(position);
+              MineSweeper.checkBlock(position);
 
               return position;
             }
@@ -80,9 +75,9 @@ export default function DashBoard() {
   return (
     <div className={cls} ref={ref}>
       {board?.map((b) => {
-        const { x, y, key, tipsNum, hasMine, isCovered, isDoubted, flagged } = b;
+        const { x, y, key, tipsNum, hasMine, isCovered, isFlagged, isDoubted } = b;
 
-        return <Block key={key} tipsNum={tipsNum} hasMine={hasMine} isCovered={isCovered} data-x={x} data-y={y} />;
+        return <Block key={key} tipsNum={tipsNum} hasMine={hasMine} isCovered={isCovered} isFlagged={isFlagged} devMode={devMode} data-x={x} data-y={y} />;
       })}
     </div>
   );

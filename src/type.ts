@@ -18,7 +18,7 @@ export type MatrixShape = {
 };
 
 export interface GameBase {
-  checkGameStatus(...args: any[]): void;
+  checkBlock(...args: any[]): void;
 }
 
 export interface GameState {
@@ -28,6 +28,7 @@ export interface GameState {
   startTime: typeof DateTime | number | null;
   endTime: typeof DateTime | number | null;
   minePlaced: boolean;
+  devMode: boolean;
   minesTotal: number;
   board: BlockType[]; // flatten the matrix array
 }
@@ -43,7 +44,7 @@ export type BlockType = {
   tipsNum: number;
   hasMine: boolean;
   isCovered: boolean;
-  flagged?: boolean;
+  isFlagged: boolean;
   isDoubted?: boolean;
   key?: string;
 };

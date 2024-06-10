@@ -4,9 +4,11 @@ import { cn } from '@/lib/utils';
 import { BlockType } from '@/type';
 
 export interface BlockProps {
+  devMode?: boolean;
   tipsNum: BlockType['tipsNum'];
   hasMine: BlockType['hasMine'];
   isCovered: BlockType['isCovered'];
+  isFlagged: BlockType['isFlagged'];
   'data-x'?: BlockType['x'];
   'data-y'?: BlockType['y'];
   onClick?: () => void;
@@ -23,18 +25,33 @@ function transformCls(isActived: boolean) {
 }
 
 const Bomb = (props: any) => {
-  return <BombIcon className='w-5 h-5 absolute pointer-events-none' />;
+  const { devMode } = props;
+
+  return devMode && <BombIcon className='w-5 h-5 absolute pointer-events-none' />;
+};
+
+const TipsNum = (props: any) => {
+  const { tipsNum, isCovered, devMode } = props;
+
+  const devEl = <p className='text-sm pointer-events-none'>{isCovered ? tipsNum : tipsNum > 0 ? tipsNum : null}</p>;
+  const normalEl = <p className='text-sm pointer-events-none'>{!isCovered && tipsNum > 0 ? tipsNum : null}</p>;
+
+  return devMode ? devEl : normalEl;
 };
 
 const Block = (props: BlockProps) => {
-  const { tipsNum, hasMine, isCovered, onClick, ...rest } = props;
+  const { tipsNum, hasMine, isCovered, isFlagged, devMode, ...rest } = props;
 
   return (
     <>
-      <Button variant='ghost' className={transformCls(!isCovered)} onClick={onClick} {...rest}>
-        {tipsNum < 0 ? <Bomb /> : tipsNum}
+      <Button
+        variant='ghost'
+        className={transformCls(!isCovered)}
+        {...rest}
+        //
+      >
+        {tipsNum < 0 ? <Bomb devMode={devMode} /> : <TipsNum devMode={devMode} isCovered={isCovered} tipsNum={tipsNum} />}
       </Button>
-      {/* <div className='border-indigo-100 border-[0.5px]'>111</div> */}
     </>
   );
 };

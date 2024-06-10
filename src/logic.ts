@@ -3,6 +3,7 @@ import { watch } from 'valtio/utils';
 import { genUUID, getFlatPosi, isInBoard, isValidSize, getMinesTotal } from './lib/utils';
 import { BlockType, GameBase, GameState, Position, MatrixShape } from './type';
 import { DateTime } from 'luxon';
+import { getVersion } from 'valtio';
 
 function createBlock({ x, y }: Position): BlockType {
   return {
@@ -12,7 +13,7 @@ function createBlock({ x, y }: Position): BlockType {
     tipsNum: 0,
     hasMine: false,
     isCovered: true,
-    flagged: false,
+    isFlagged: false,
   };
 }
 
@@ -28,6 +29,8 @@ const directions = [
   [1, -1],
 ];
 
+let MineSweeper;
+
 export class GameInstance implements GameBase {
   state: GameState;
   history: Map<number, GameState>;
@@ -41,6 +44,7 @@ export class GameInstance implements GameBase {
       board: [],
       startTime: DateTime.now().toUnixInteger(),
       endTime: null,
+      devMode: true,
       minePlaced: false,
       minesTotal: getMinesTotal({ w, h }),
     });
@@ -76,19 +80,17 @@ export class GameInstance implements GameBase {
   initWatcher() {
     // board Watcher
     watch((get) => {
-      // const state = get(this.state);
-      const board = get(this.state.board);
-
-      // 这里可以根据board的变化执行相应的逻辑
+      // 这里可以根据 state 的变化执行相应的逻辑
       // 例如, 检查游戏状态、更新UI等
 
-      console.info('Board has changed', board);
+      const { status } = get(this.state);
+
+      this.checkGameStatus();
     });
   }
 
   // 处理游戏逻辑的入口
-  // 这里其实可以用 key, 但是抽象成矩阵的设计思路, 让我倾向于这里用坐标
-  checkGameStatus(position: Position) {
+  checkGameStatus() {
     if (this.state.status === 'lost') {
       console.info('you lose');
       return;
@@ -100,53 +102,58 @@ export class GameInstance implements GameBase {
     }
 
     if (this.state.status === 'playing') {
-      // Just First Step
-      if (!this.state.minePlaced) {
-        const firstPosition = position;
-        const size = { w: this.state.w, h: this.state.h };
+      return;
+    }
+  }
 
-        // 放雷并标识雷数目
-        this.placeMines(this.state.board, size, firstPosition);
-        ++this.currStep;
+  // 这里其实可以用 key, 但是抽象成矩阵的设计思路, 让我倾向于这里用坐标
+  checkBlock(position: Position) {
+    if (this.state.status !== 'playing') return;
 
-        return;
-      } else {
-        // normal step
-        const idx = getFlatPosi({ p: position, w: this.state.w });
-        const block = this.state.board?.[idx];
+    // Just First Step
+    if (!this.state.minePlaced) {
+      const firstPosition = position;
+      const size = { w: this.state.w, h: this.state.h };
 
-        console.info('normal position', position);
+      // 放雷并标识雷数目
+      this.placeMines(this.state.board, size, firstPosition);
+      ++this.currStep;
 
-        // 💣 boom...
-        if (block.hasMine) {
-          this.state.status = 'lost';
-          ++this.currStep;
-          this.checkGameStatus(position);
+      return;
+    }
 
-          return;
-        }
+    // normal step
+    const idx = getFlatPosi({ p: position, w: this.state.w });
+    const block = this.state.board?.[idx];
 
-        // 🤔 continue...
-        if (block.isCovered) {
-          this.discoverBlock(position);
-          ++this.currStep;
+    // 💣 boom...
+    if (block.hasMine) {
+      this.state.status = 'lost';
+      ++this.currStep;
+      // this.checkBlock(position);
 
-          // 🥇 yeah!
-          if (this.isFulfillWinConditions()) {
-            this.state.status = 'won';
-          }
+      return;
+    }
 
-          this.checkGameStatus(position);
+    // 🤔 continue...
+    if (block.isCovered) {
+      this.discoverBlock(position);
+      ++this.currStep;
 
-          return;
-        }
+      // 🥇 yeah!
+      if (this.isFulfillWinConditions()) {
+        this.state.status = 'won';
       }
+
+      // this.checkBlock(position);
+
+      return;
     }
   }
 
   // 判断是否满足胜利条件
   isFulfillWinConditions() {
-    const board = this.state.board
+    const board = this.state.board;
     const total = getMinesTotal({ w: this.state.w, h: this.state.h });
 
     // 1. 全部标记正确(最终还是要揭开来进行验证，此条件不正确)
@@ -189,19 +196,6 @@ export class GameInstance implements GameBase {
         }
       }
 
-      // const mines = board
-      //   .map((b, index) => {
-      //     if (b.hasMine) {
-      //       return [index, b];
-      //     }
-      //   })
-      //   .filter((b) => b);
-
-      // // @ts-ignore
-      // const minesMap = new Map(mines);
-
-      // console.info('generated mines done', { minesPlaced, minesTotal, mines, minesMap });
-
       // 首次点击必定不为雷, 但同时需要在全局放完雷, 有了 tipsNum 之后, 再揭开当前格子
       this.discoverBlock(firstPosition);
 
@@ -216,18 +210,26 @@ export class GameInstance implements GameBase {
     const idx = getFlatPosi({ p: { x, y }, w: this.state.w });
     const block = this.state.board?.[idx];
 
-    // if (block && !block.hasMine && block.isCovered) {
     if (block && block.isCovered) {
       block.isCovered = false;
 
-      const sibilings = this.getSiblingsIdx({ x, y });
-      sibilings.forEach((i) => {
-        const sBlock = this.state.board?.[i];
+      if (block.tipsNum === 0) {
+        const sibilings = this.getSiblingsIdx({ x, y });
 
-        if (sBlock.tipsNum === 0) {
-          this.discoverBlock({ x: sBlock.x, y: sBlock.y });
-        }
-      });
+        sibilings.forEach((i) => {
+          const sBlock = this.state.board?.[i];
+
+          if (sBlock.tipsNum > 0) {
+            sBlock.isCovered = false;
+            return;
+          }
+
+          if (sBlock.tipsNum === 0) {
+            this.discoverBlock({ x: sBlock.x, y: sBlock.y });
+            return;
+          }
+        });
+      }
     }
   }
 
@@ -255,6 +257,9 @@ export class GameInstance implements GameBase {
     sibilings.forEach((idx) => ++board[idx].tipsNum);
   }
 
+  // 重置游戏
+  reset() {}
+
   // TODO: snapShot 功能暂不开放, 注意：这里的数据是 valtio 的代理对象, 可能会有一些待解决的问题
 
   // 保存当前快照
@@ -271,3 +276,7 @@ export class GameInstance implements GameBase {
   //   }
   // }
 }
+
+MineSweeper = new GameInstance
+
+export { MineSweeper };
