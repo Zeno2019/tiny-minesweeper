@@ -262,7 +262,9 @@ export class GameInstance implements GameBase {
   }
 
   // 重置游戏
-  reset() {}
+  reset(
+
+  ) {}
 
   // TODO: snapShot 功能暂不开放, 注意：这里的数据是 valtio 的代理对象, 可能会有一些待解决的问题
 
