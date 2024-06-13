@@ -60,7 +60,6 @@ const Block = (props: BlockProps) => {
 
   return (
     <Button variant='ghost' className={transformCls({ isActived: !isCovered, isBoom })} {...rest}>
-      {/* {tipsNum < 0 ? <Bomb devMode={devMode} /> : <DyncNumber devMode={devMode} isCovered={isCovered} number={tipsNum} />} */}
       {blockSlot({ devMode, isBoom, isCovered, isFlagged, tipsNum })}
     </Button>
   );

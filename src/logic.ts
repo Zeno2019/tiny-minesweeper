@@ -210,7 +210,7 @@ export class GameInstance implements GameBase {
     const idx = getFlatPosi({ p: { x, y }, w: this.state.w });
     const block = this.state.board?.[idx];
 
-    if (block && block.isCovered) {
+    if (block && block.isCovered && !block.isFlagged) {
       block.isCovered = false;
 
       if (block.tipsNum === 0) {
@@ -261,10 +261,36 @@ export class GameInstance implements GameBase {
     this.state.devMode = !this.state.devMode;
   }
 
-  // 重置游戏
-  reset(
+  toggleFlag({ x, y }: Position) {
+    const idx = getFlatPosi({ p: { x, y }, w: this.state.w });
+    const block = this.state.board?.[idx];
+    const { minesTotal } = this.state;
 
-  ) {}
+    if (block && block.isCovered) {
+      if (minesTotal <= 0 && !block.isFlagged) {
+        console.error('flag should not exceed mines total!');
+
+        return;
+      }
+
+      if (block.isFlagged) {
+        block.isFlagged = false;
+        this.state.minesTotal += 1;
+
+        return;
+      }
+
+      if (!block.isFlagged) {
+        block.isFlagged = true;
+        this.state.minesTotal -= 1;
+
+        return;
+      }
+    }
+  }
+
+  // 重置游戏
+  reset() {}
 
   // TODO: snapShot 功能暂不开放, 注意：这里的数据是 valtio 的代理对象, 可能会有一些待解决的问题
 
@@ -283,7 +309,7 @@ export class GameInstance implements GameBase {
   // }
 }
 
-// MineSweeper = new GameInstance()
-MineSweeper = new GameInstance(16, 16);
+MineSweeper = new GameInstance();
+// MineSweeper = new GameInstance(16, 16);
 
 export { MineSweeper };

@@ -29,47 +29,92 @@ export default function DashBoard() {
 
   React.useEffect(() => {
     const boardEl = ref.current;
+    if (!boardEl) return;
 
-    if (boardEl) {
-      // Event Watcher
-      fromEvent<MouseEvent>(boardEl, 'click')
-        .pipe(
-          map((ev) => {
-            const target = ev?.target as HTMLElement;
+    // Event Watcher
+    const leftClick$ = fromEvent<MouseEvent>(boardEl, 'click')
+      .pipe(
+        map((ev) => {
+          const target = ev?.target as HTMLElement;
 
-            if (isLeagalGameEl(ev)) {
-              const x = target.getAttribute('data-x');
-              const y = target.getAttribute('data-y');
+          if (isLeagalGameEl(ev)) {
+            const x = target.getAttribute('data-x');
+            const y = target.getAttribute('data-y');
 
-              const position = { x: Number(x), y: Number(y) };
-              MineSweeper.checkBlock(position);
+            const position = { x: Number(x), y: Number(y) };
+            MineSweeper.checkBlock(position);
 
-              return position;
-            }
-          }),
-          catchError((err) => {
-            console.error('Error occurred', err);
+            return position;
+          }
+        }),
+        catchError((err) => {
+          console.error('Error occurred', err);
 
-            return of(null);
-          })
-        )
-        .subscribe({
-          next: (result) => {
-            if (result) {
-              console.info('Watcher Next', result);
-            } else {
-              console.error('Error occurred and was handled');
-            }
-          },
-          error: (err) => {
-            console.error('Unhandled Error', err);
-          },
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (result) => {
+          if (result) {
+            console.info('Watcher Next', result);
+          } else {
+            console.error('Error occurred and was handled');
+          }
+        },
+        error: (err) => {
+          console.error('Unhandled Error', err);
+        },
 
-          complete: () => {
-            console.info('Watcher Complete');
-          },
-        });
-    }
+        complete: () => {
+          console.info('Watcher Complete');
+        },
+      });
+
+    const rightClick$ = fromEvent<MouseEvent>(boardEl, 'contextmenu')
+      .pipe(
+        map((ev) => {
+          ev.preventDefault();
+
+          const target = ev?.target as HTMLElement;
+
+          if (isLeagalGameEl(ev)) {
+            const x = target.getAttribute('data-x');
+            const y = target.getAttribute('data-y');
+
+            const position = { x: Number(x), y: Number(y) };
+
+            MineSweeper.toggleFlag(position)
+
+            return position;
+          }
+        }),
+        catchError((err) => {
+          console.error('Error occurred', err);
+
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (result) => {
+          if (result) {
+            console.info('Watcher Next', result);
+          } else {
+            console.error('Error occurred and was handled');
+          }
+        },
+        error: (err) => {
+          console.error('Unhandled Error', err);
+        },
+
+        complete: () => {
+          console.info('Watcher Complete');
+        },
+      });
+
+    return () => {
+      leftClick$.unsubscribe();
+      rightClick$.unsubscribe();
+    };
   }, []);
 
   return (
