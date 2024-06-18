@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
 import { TimerIcon } from '@/Icons';
 import { MineSweeper } from '@/logic';
 import { useSnapshot } from 'valtio';
 import { _setInterval } from '@/lib/utils';
-import { DateTime, Duration } from 'luxon';
+import { DateTime} from 'luxon';
 import PluginLayout from '@/layouts/PluginLayout';
 import useInterval from '@/lib/hooks/useInterval';
 
