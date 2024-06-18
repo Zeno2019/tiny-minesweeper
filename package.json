@@ -15,6 +15,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/themes": "^2.0.3",
+    "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "luxon": "^3.4.4",
@@ -27,6 +28,7 @@
     "valtio-history": "^0.3.2"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.6.4",
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.11.26",
     "@types/react": "^18.2.56",
