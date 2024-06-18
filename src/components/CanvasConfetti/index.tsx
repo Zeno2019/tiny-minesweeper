@@ -35,7 +35,7 @@ const CanvasConfetti = function () {
   }, []);
 
   return (
-      <canvas ref={ref} className='w-full h-full absolute' />
+      <canvas ref={ref} className='w-full h-full absolute pointer-events-none' />
   );
 };
 
