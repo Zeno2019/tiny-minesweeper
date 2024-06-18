@@ -2,7 +2,7 @@ import { proxyWithHistory } from 'valtio-history';
 import { watch } from 'valtio/utils';
 import { genUUID, getFlatPosi, isInBoard, isValidSize, getMinesTotal } from './lib/utils';
 import { BlockType, GameBase, GameState, Position, MatrixShape } from './type';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
 
 function createBlock({ x, y }: Position): BlockType {
   return {
@@ -14,6 +14,22 @@ function createBlock({ x, y }: Position): BlockType {
     isCovered: true,
     isFlagged: false,
   };
+}
+
+function createBoard({ w, h }: MatrixShape) {
+  if (!isValidSize({ w, h })) throw new Error('invalid size');
+
+  const board = Array.from({ length: w * h }, (_, idx) => {
+    // 计算当前块的 x 和 y 坐标
+    const x = idx % w;
+
+    // 当前 block 下标除以行宽度, 向下取整
+    const y = Math.floor(idx / w);
+
+    return createBlock({ x, y });
+  });
+
+  return board;
 }
 
 // 八方向坐标运算
@@ -36,55 +52,51 @@ export class GameInstance implements GameBase {
   currStep: number;
 
   constructor(w = 9, h = 9) {
-    const { value } = proxyWithHistory<GameState>({
+    const s = this.generateState({ w, h });
+    const { value } = proxyWithHistory<GameState>(s);
+
+    this.state = value;
+    this.currStep = 0;
+    this.history = new Map<number, GameState>(); // 记录快照
+
+    this.initWatcher();
+  }
+
+  generateState({ w, h }: MatrixShape) {
+    if (!isValidSize({ w, h })) throw new Error('invalid size');
+
+    return {
       status: 'playing',
       w,
       h,
-      board: [],
-      // startTime: DateTime.now().toUnixInteger(),
+      board: createBoard({ w, h }),
       startTime: 0,
       currentTime: 0,
       devMode: false,
       minePlaced: false,
       minesTotal: getMinesTotal({ w, h }),
-    });
-
-    this.state = value;
-    this.history = new Map<number, GameState>(); // 记录快照
-    this.currStep = 0;
-
-    this.initBoard({ w, h });
-    this.initWatcher();
+    } as GameState;
   }
 
-  initBoard({ w, h }: MatrixShape) {
-    if (!isValidSize({ w, h })) throw new Error('invalid size');
+  reset({ w, h }: MatrixShape) {
+    const s = this.generateState({ w, h });
 
-    const board = Array.from({ length: w * h }, (_, idx) => {
-      // 计算当前块的 x 和 y 坐标
-      const x = idx % w;
-
-      // 当前 block 下标除以行宽度, 向下取整
-      const y = Math.floor(idx / w);
-
-      return createBlock({ x, y });
+    Object.keys(s).forEach((key) => {
+      if (key in this.state) {
+        (this.state as any)[key as keyof GameState] = s[key as keyof GameState];
+      }
     });
 
-    this.state.board = board;
-
-    // 初始化后进行保存
-    // this.saveSnapshot();
-    return this;
+    this.currStep = 0;
   }
 
   initWatcher() {
-    // board Watcher
+    // state Watcher
     watch((get) => {
       // 这里可以根据 state 的变化执行相应的逻辑
       // 例如, 检查游戏状态、更新UI等
 
-      const { status } = get(this.state);
-
+      get(this.state);
       this.checkGameStatus();
     });
   }
@@ -292,9 +304,6 @@ export class GameInstance implements GameBase {
       }
     }
   }
-
-  // 重置游戏
-  reset() {}
 
   // 更新时间
   updateTime(t: GameState['currentTime']) {
