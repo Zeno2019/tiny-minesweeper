@@ -19,7 +19,8 @@ export interface BlockProps {
 }
 
 function transformCls({ isActived, isBoom }: { isActived: boolean; isBoom?: boolean }) {
-  const baseCls = 'h-8 w-8 flex place-items-center m-[0.05rem] rounded-[0.2rem] border-indigo-300 border-[0.05rem]';
+  // const baseCls = 'h-8 w-8 flex place-items-center rounded-[0.2rem] border-indigo-300 border-[0.05rem]';
+  const baseCls = 'h-[2rem] w-[2rem] flex place-items-center rounded-[0.2rem] border-indigo-300 border-[0.05rem]';
   const inactivedCls = 'bg-indigo-200 hover:bg-indigo-100';
   const activedCls = 'bg-inherit hover:bg-inherit';
   const boomCls = 'bg-red-500/50 hover:bg-red-500/100';
