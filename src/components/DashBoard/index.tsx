@@ -16,11 +16,11 @@ export default function DashBoard() {
       'grid-cols-30': w === 30,
       'grid-rows-9': h <= 9,
       'grid-rows-16': h === 16,
+      'scale-95': w === 30,
     },
     'grid',
     'auto-rows-min',
-    'min-h-[16rem]',
-    'p-4'
+    'min-h-[16rem]'
   );
 
   const cls = cn(layoutCls);
@@ -83,7 +83,7 @@ export default function DashBoard() {
 
             const position = { x: Number(x), y: Number(y) };
 
-            MineSweeper.toggleFlag(position)
+            MineSweeper.toggleFlag(position);
 
             return position;
           }

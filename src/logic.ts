@@ -79,6 +79,7 @@ export class GameInstance implements GameBase {
   }
 
   reset({ w, h }: MatrixShape) {
+    if (!isValidSize({ w, h })) throw new Error('invalid size');
     const s = this.generateState({ w, h });
 
     Object.keys(s).forEach((key) => {
