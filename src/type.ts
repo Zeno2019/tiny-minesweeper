@@ -25,8 +25,8 @@ export interface GameState {
   status: CurrGameStatus;
   w: MatrixShape['w'];
   h: MatrixShape['h'];
-  startTime: typeof DateTime | number | null;
-  endTime: typeof DateTime | number | null;
+  startTime: number;
+  currentTime: number;
   minePlaced: boolean;
   devMode: boolean;
   minesTotal: number;

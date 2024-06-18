@@ -2,8 +2,7 @@ import { proxyWithHistory } from 'valtio-history';
 import { watch } from 'valtio/utils';
 import { genUUID, getFlatPosi, isInBoard, isValidSize, getMinesTotal } from './lib/utils';
 import { BlockType, GameBase, GameState, Position, MatrixShape } from './type';
-import { DateTime } from 'luxon';
-import { getVersion } from 'valtio';
+import { DateTime, Duration } from 'luxon';
 
 function createBlock({ x, y }: Position): BlockType {
   return {
@@ -42,8 +41,9 @@ export class GameInstance implements GameBase {
       w,
       h,
       board: [],
-      startTime: DateTime.now().toUnixInteger(),
-      endTime: null,
+      // startTime: DateTime.now().toUnixInteger(),
+      startTime: 0,
+      currentTime: 0,
       devMode: false,
       minePlaced: false,
       minesTotal: getMinesTotal({ w, h }),
@@ -117,6 +117,10 @@ export class GameInstance implements GameBase {
 
       // 放雷并标识雷数目
       this.placeMines(this.state.board, size, firstPosition);
+
+      // 开始计时
+      this.state.startTime = DateTime.now().toUnixInteger();
+
       ++this.currStep;
 
       return;
@@ -291,6 +295,15 @@ export class GameInstance implements GameBase {
 
   // 重置游戏
   reset() {}
+
+  // 更新时间
+  updateTime(t: GameState['currentTime']) {
+    if (!this.state.startTime) {
+      this.state.startTime = t;
+    }
+
+    this.state.currentTime = t;
+  }
 
   // TODO: snapShot 功能暂不开放, 注意：这里的数据是 valtio 的代理对象, 可能会有一些待解决的问题
 

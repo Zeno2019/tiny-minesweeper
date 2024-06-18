@@ -89,3 +89,33 @@ export function isLeagalGameEl(e: MouseEvent | TouchEvent) {
 export function isInBoard(p: Position, w: GameState['w'], h: GameState['h']) {
   return p.x >= 0 && p.y >= 0 && p.x < w && p.y < h;
 }
+
+export function _setInterval({ cb, cancelCb, interval = 1000 }: { cb: Function; cancelCb?: () => boolean; interval?: number }) {
+  let timer: number | null = null;
+  let expectedTime = Date.now() + interval;
+
+  const fn = () => {
+    const drift = Date.now() - expectedTime; // 计算偏移量
+    if (drift >= 0) {
+      cb();
+      expectedTime += interval;
+    }
+
+    if (!cancelCb || !cancelCb()) {
+      timer = requestAnimationFrame(fn);
+    } else {
+      if (timer !== null) {
+        cancelAnimationFrame(timer);
+      }
+    }
+  };
+
+  // 初始化调用
+  timer = requestAnimationFrame(fn);
+
+  return () => {
+    if (timer !== null) {
+      cancelAnimationFrame(timer);
+    }
+  };
+}
