@@ -105,12 +105,12 @@ export class GameInstance implements GameBase {
   // 处理游戏逻辑的入口
   checkGameStatus() {
     if (this.state.status === 'lost') {
-      console.info('you lose');
+      console.info('game over');
       return;
     }
 
     if (this.state.status === 'won') {
-      console.info('you won');
+      console.info('you win');
       return;
     }
 

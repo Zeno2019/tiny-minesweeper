@@ -1,5 +1,7 @@
 import React from 'react';
 import JSConfetti from 'js-confetti';
+import { useSnapshot } from 'valtio';
+import { MineSweeper } from '@/logic';
 
 // const confettiColors = [
 //   '#4f46e5', // 基础颜色
@@ -10,9 +12,13 @@ import JSConfetti from 'js-confetti';
 //   '#C7D2FE', // 很浅的颜色
 // ];
 
-const CanvasConfetti = function (props: { active: boolean; isWon?: boolean }) {
+const CanvasConfetti = function () {
   const ref = React.useRef(null);
-  const { active, isWon } = props;
+  const { status } = useSnapshot(MineSweeper.state);
+
+  const isWon = status === 'won';
+  const isLost = status === 'lost';
+  const active = isWon || isLost;
 
   React.useEffect(() => {
     const canvasRef = ref.current;
