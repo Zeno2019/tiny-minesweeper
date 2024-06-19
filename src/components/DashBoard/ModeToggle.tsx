@@ -9,7 +9,7 @@ export default function ModeToggle() {
   return (
     <div className='flex items-center space-x-2'>
       <Label htmlFor='dev-mode-switch' className='text-lg'>
-        Dev Mode
+        Dev
       </Label>
       <Switch id='dev-mode-switch' className='data-[state=checked]:bg-indigo-600' checked={devMode} onCheckedChange={() => MineSweeper.toggleDevMode()} />
     </div>

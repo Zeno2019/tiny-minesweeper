@@ -10,10 +10,11 @@ import { MineSweeper } from './logic';
 export default function App() {
   const { status } = useSnapshot(MineSweeper.state);
   const isWon = status === 'won';
+  const isLost = status === 'lost';
 
   return (
     <BaseLayout title={'Tiny Minesweeper'} className='flex flex-col justify-evenly items-center gap-6'>
-      {isWon && <CanvasConfetti />}
+      <CanvasConfetti active={isWon || isLost} isWon={isWon} />
       <ActionSpace />
       <RealTimeInfo />
       <DashBoard />
