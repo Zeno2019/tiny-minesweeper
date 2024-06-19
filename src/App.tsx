@@ -9,7 +9,7 @@ import GameDialog from '@/components/GameDialog';
 export default function App() {
 
   return (
-    <BaseLayout title={'Tiny Minesweeper'} className='flex flex-col justify-evenly items-center gap-6'>
+    <BaseLayout title={'<Tiny Minesweeper/>'} className='flex flex-col justify-evenly items-center gap-6'>
       <CanvasConfetti />
       <GameDialog />
       <ActionSpace />
