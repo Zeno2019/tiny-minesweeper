@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Block from './plugin/Block';
-import { cn, isLeagalGameEl } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { MineSweeper } from '@/logic';
 import { useSnapshot } from 'valtio';
-import { of, fromEvent, map, catchError } from 'rxjs';
+import useMineSweeperEvents from '@/lib/hooks/useMineSweeperEvents';
+import { Position } from '@/type';
 
 export default function DashBoard() {
   const { board, devMode, w, h } = useSnapshot(MineSweeper.state);
@@ -25,97 +26,11 @@ export default function DashBoard() {
 
   const cls = cn(layoutCls);
 
-  const ref = React.useRef(null);
+  const ref = React.useRef<HTMLDivElement>(null);
+  const onLeftClick = useCallback((position: Position) => MineSweeper.checkBlock(position), []);
+  const onRightClick = useCallback((position: Position) => MineSweeper.toggleFlag(position), []);
 
-  React.useEffect(() => {
-    const boardEl = ref.current;
-    if (!boardEl) return;
-
-    // Event Watcher
-    const leftClick$ = fromEvent<MouseEvent>(boardEl, 'click')
-      .pipe(
-        map((ev) => {
-          const target = ev?.target as HTMLElement;
-
-          if (isLeagalGameEl(ev)) {
-            const x = target.getAttribute('data-x');
-            const y = target.getAttribute('data-y');
-
-            const position = { x: Number(x), y: Number(y) };
-            MineSweeper.checkBlock(position);
-
-            return position;
-          }
-        }),
-        catchError((err) => {
-          console.error('Error occurred', err);
-
-          return of(null);
-        })
-      )
-      .subscribe({
-        next: (result) => {
-          if (result) {
-            console.info('Watcher Next', result);
-          } else {
-            console.error('Error occurred and was handled');
-          }
-        },
-        error: (err) => {
-          console.error('Unhandled Error', err);
-        },
-
-        complete: () => {
-          console.info('Watcher Complete');
-        },
-      });
-
-    const rightClick$ = fromEvent<MouseEvent>(boardEl, 'contextmenu')
-      .pipe(
-        map((ev) => {
-          ev.preventDefault();
-
-          const target = ev?.target as HTMLElement;
-
-          if (isLeagalGameEl(ev)) {
-            const x = target.getAttribute('data-x');
-            const y = target.getAttribute('data-y');
-
-            const position = { x: Number(x), y: Number(y) };
-
-            MineSweeper.toggleFlag(position);
-
-            return position;
-          }
-        }),
-        catchError((err) => {
-          console.error('Error occurred', err);
-
-          return of(null);
-        })
-      )
-      .subscribe({
-        next: (result) => {
-          if (result) {
-            console.info('Watcher Next', result);
-          } else {
-            console.error('Error occurred and was handled');
-          }
-        },
-        error: (err) => {
-          console.error('Unhandled Error', err);
-        },
-
-        complete: () => {
-          console.info('Watcher Complete');
-        },
-      });
-
-    return () => {
-      leftClick$.unsubscribe();
-      rightClick$.unsubscribe();
-    };
-  }, []);
+  useMineSweeperEvents(ref, { onLeftClick, onRightClick });
 
   return (
     <div className={cls} ref={ref}>

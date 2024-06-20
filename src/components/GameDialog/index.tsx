@@ -3,8 +3,9 @@ import { Dialog, DialogPortal, DialogContent, DialogOverlay, DialogFooter, Dialo
 import { useSnapshot } from 'valtio';
 import { MineSweeper } from '@/logic';
 
-function GameDialog(props: any) {
+function GameDialog() {
   const [open, setOpen] = React.useState(false);
+
   const { status } = useSnapshot(MineSweeper.state);
   const needOpen = status === 'won' || status === 'lost';
 

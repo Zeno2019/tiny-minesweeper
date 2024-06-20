@@ -3,15 +3,6 @@ import JSConfetti from 'js-confetti';
 import { useSnapshot } from 'valtio';
 import { MineSweeper } from '@/logic';
 
-// const confettiColors = [
-//   '#4f46e5', // 基础颜色
-//   '#4339F2', // 稍微深一点的颜色
-//   '#6366F1', // 稍微偏浅一点的颜色
-//   '#818CF8', // 更浅色
-//   '#A5B4FC', // 浅色
-//   '#C7D2FE', // 很浅的颜色
-// ];
-
 const CanvasConfetti = function () {
   const ref = React.useRef(null);
   const { status } = useSnapshot(MineSweeper.state);
