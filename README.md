@@ -1,4 +1,4 @@
 # Tiny Minesweeper
 ## 扫雷 demo
 
-## 👉 [Play](https://example.com)
+## 👉 [Play](https://tiny-minesweeper.netlify.app/)

@@ -6,7 +6,7 @@ export default function Footer({ className }: { className?: string }) {
 
   return (
     <div className={cls}>
-      <Social url='www.github.com' user='Zeno2019' />
+      <Social url='https://github.com/Zeno2019/tiny-minesweeper' />
       <Social url='web.okjike.com' user='u/939FB4E7-2C65-43CA-8AFD-127E9A9B6A6D' />
     </div>
   );

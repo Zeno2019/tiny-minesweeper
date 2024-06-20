@@ -24,8 +24,8 @@ export default function ActionSpace() {
       <Button variant='ghost' className='text-lg bg-indigo-600 text-slate-100 hover:bg-indigo-700 hover:text-slate-100' onClick={onReset}>
         🎮 New Game
       </Button>
-      <Button variant='ghost' className='text-lg bg-indigo-600 text-slate-100 hover:bg-indigo-700 hover:text-slate-100'>
-        📑 Read Me
+      <Button asChild variant='ghost' className='text-lg bg-indigo-600 text-slate-100 hover:bg-indigo-700 hover:text-slate-100'>
+        <a target='_blank' href='https://github.com/Zeno2019/tiny-minesweeper/blob/master/README.md'>📑 Read Me</a>
       </Button>
     </div>
   );

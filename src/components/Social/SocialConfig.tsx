@@ -3,25 +3,39 @@ import { GitHubLogoIcon, JikeIcon } from '../../Icons';
 
 // Icon Patch
 export const mediaNameMap: Record<string, { name: string; icon?: ReactNode }> = {
-  'www.github.com': {
+  'github': {
     name: 'Github',
     icon: <GitHubLogoIcon className='w-6 h-6' />,
   },
-  'web.okjike.com': {
+  'okjike': {
     name: '即刻',
     icon: <JikeIcon className='w-6 h-6' />,
   },
-  'www.douban.com': {
+  'douban': {
     name: '豆瓣',
     // icon: undefined,
   },
 
-  'www.zhihu.com': {
+  'zhihu': {
     name: '知乎',
     // icon: undefined,
   },
-  'www.bilibili.com': {
+  'bilibili': {
     name: '哔哩哔哩',
     // icon: undefined,
   },
 };
+
+export function mappingSocial(domain: string): { name: string; icon?: ReactNode } | undefined {
+  const domainParts = domain.split('.');
+  const mainPart = domainParts.length > 1 ? domainParts[domainParts.length - 2] : domain;
+
+  const keys = Object.keys(mediaNameMap);
+  for (const key of keys) {
+    if (mainPart.includes(key)) {
+      return mediaNameMap[key];
+    }
+  }
+
+  return undefined;
+}
