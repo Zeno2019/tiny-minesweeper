@@ -332,7 +332,6 @@ export class GameInstance implements GameBase {
   // }
 }
 
-// MineSweeper = new GameInstance();
-MineSweeper = new GameInstance(16, 16);
+MineSweeper = new GameInstance();
 
 export { MineSweeper };
