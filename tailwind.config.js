@@ -9,17 +9,9 @@ module.exports = {
   ],
   prefix: "",
   theme: {
-    container: {
-      center: true,
-      // padding: "1rem",
-      screens: {
-        sm: "375px",
-
-        md: "768px",
-
-        lg: "1024px",
-      },
-    },
+    // container: {
+    //   center: true,
+    // },
     extend: {
       colors: {
         border: "hsl(var(--border))",

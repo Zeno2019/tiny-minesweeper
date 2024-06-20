@@ -98,26 +98,26 @@ export class GameInstance implements GameBase {
       // 例如, 检查游戏状态、更新UI等
 
       get(this.state);
-      this.checkGameStatus();
+      // this.checkGameStatus();
     });
   }
 
   // 处理游戏逻辑的入口
-  checkGameStatus() {
-    if (this.state.status === 'lost') {
-      console.info('game over');
-      return;
-    }
+  // checkGameStatus() {
+  //   if (this.state.status === 'lost') {
+  //     console.info('game over');
+  //     return;
+  //   }
 
-    if (this.state.status === 'won') {
-      console.info('you win');
-      return;
-    }
+  //   if (this.state.status === 'won') {
+  //     console.info('you win');
+  //     return;
+  //   }
 
-    if (this.state.status === 'playing') {
-      return;
-    }
-  }
+  //   if (this.state.status === 'playing') {
+  //     return;
+  //   }
+  // }
 
   // 这里其实可以用 key, 但是抽象成矩阵的设计思路, 让我倾向于这里用坐标
   checkBlock(position: Position) {

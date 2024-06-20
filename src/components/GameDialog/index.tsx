@@ -20,8 +20,8 @@ function GameDialog(props: any) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogPortal>
         <DialogOverlay className='bg-blackA6 data-[state=open]:animate-overlayShow' />
-        <DialogContent>
-          <div className='flex justify-center text-2xl'>{status === 'won' ? '🥳 <You Win/> 🎉' : '🤡 <Game Over/> 🤡'}</div>
+        <DialogContent className='w-[25rem] h-[15rem] rounded-lg'>
+          <div className='flex justify-center place-items-center text-2xl'>{status === 'won' ? '🥳 <You Win/> 🎉' : '🤡 <Game Over/> 🤡'}</div>
         </DialogContent>
       </DialogPortal>
     </Dialog>
