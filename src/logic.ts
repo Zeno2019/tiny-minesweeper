@@ -1,5 +1,4 @@
 import { proxyWithHistory } from 'valtio-history';
-import { watch } from 'valtio/utils';
 import { genUUID, getFlatPosi, isInBoard, isValidSize, getMinesTotal } from './lib/utils';
 import { BlockType, GameBase, GameState, Position, MatrixShape } from './type';
 import { DateTime } from 'luxon';
@@ -58,8 +57,6 @@ export class GameInstance implements GameBase {
     this.state = value;
     this.currStep = 0;
     this.history = new Map<number, GameState>(); // 记录快照
-
-    this.initWatcher();
   }
 
   generateState({ w, h }: MatrixShape) {
@@ -90,34 +87,6 @@ export class GameInstance implements GameBase {
 
     this.currStep = 0;
   }
-
-  initWatcher() {
-    // state Watcher
-    watch((get) => {
-      // 这里可以根据 state 的变化执行相应的逻辑
-      // 例如, 检查游戏状态、更新UI等
-
-      get(this.state);
-      // this.checkGameStatus();
-    });
-  }
-
-  // 处理游戏逻辑的入口
-  // checkGameStatus() {
-  //   if (this.state.status === 'lost') {
-  //     console.info('game over');
-  //     return;
-  //   }
-
-  //   if (this.state.status === 'won') {
-  //     console.info('you win');
-  //     return;
-  //   }
-
-  //   if (this.state.status === 'playing') {
-  //     return;
-  //   }
-  // }
 
   // 这里其实可以用 key, 但是抽象成矩阵的设计思路, 让我倾向于这里用坐标
   checkBlock(position: Position) {
