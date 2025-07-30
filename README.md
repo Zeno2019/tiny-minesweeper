@@ -4,8 +4,8 @@
 
 Tiny Minesweeper 是扫雷游戏基于 React 的简单实现，旨在提供具有一定挑战性的游戏体验。你可以通过以下链接试玩这个游戏：
 
-- 主链接 / Main Link: 👉 [Play](https://tiny-minesweeper.zeabur.app/)
-- 副链接 / Secondary Link: 👉 [Play](https://tiny-minesweeper.netlify.app/)
+- 主链接 / Main Link: 👉 [Play](https://http://tiny-minesweeper-per.zeabur.app)
+- 副链接 / Secondary Link: 👉 [Play](https://tiny-minesweeper.netlify.app)
 
 ## 玩法介绍 / How to Play
 
